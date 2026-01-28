@@ -24,8 +24,9 @@ public class CaregoAutomateSessionLogger {
         ArrayList<String> sessionStorage
     ) {
         HttpRequest request = responseReceived.initiatingRequest();
-
         String path = request.path().toLowerCase();
+
+        // unique token upon login
         if (path.contains("login/company") && request.method().toLowerCase().equals("post")) {
 
             HttpResponse response = responseReceived.withStatusCode((short)200);
@@ -38,7 +39,10 @@ public class CaregoAutomateSessionLogger {
                 // ensure that the token is properly set
                 if (authResponse.token != null) {
                     api.logging().logToOutput("[+] Auth Token Detected: " + authResponse.token);
-                    sessionStorage.add(authResponse.token);
+
+                    // ensure that token is unique everytime
+                    if (!sessionStorage.contains(authResponse.token))
+                        sessionStorage.add(authResponse.token);
                 }
             } catch (JsonSyntaxException e) {
                 api.logging().logToOutput(e);
