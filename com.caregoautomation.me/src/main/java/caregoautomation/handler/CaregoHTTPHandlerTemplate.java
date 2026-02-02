@@ -27,6 +27,7 @@ public class CaregoHTTPHandlerTemplate implements HttpHandler {
 
     @Override
     public RequestToBeSentAction handleHttpRequestToBeSent(HttpRequestToBeSent requestToBeSent) {
+        CaregoAutomateSessionLogger.generalRequestSessionLogger(this.api, requestToBeSent, this.sessionStorage);
         return RequestToBeSentAction.continueWith(requestToBeSent);
     }
 
