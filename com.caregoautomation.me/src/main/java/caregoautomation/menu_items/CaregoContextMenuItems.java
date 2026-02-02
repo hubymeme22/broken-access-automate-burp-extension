@@ -1,4 +1,4 @@
-package caregoautomation;
+package caregoautomation.menu_items;
 
 import java.awt.Component;
 import java.util.ArrayList;

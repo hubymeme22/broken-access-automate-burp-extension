@@ -1,4 +1,4 @@
-package caregoautomation;
+package caregoautomation.ui;
 
 import java.awt.BorderLayout;
 

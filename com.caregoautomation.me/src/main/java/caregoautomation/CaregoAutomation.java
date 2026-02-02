@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import burp.api.montoya.BurpExtension;
 import burp.api.montoya.MontoyaApi;
 import caregoautomation.handler.CaregoHTTPHandlerTemplate;
+import caregoautomation.menu_items.CaregoContextMenuItems;
+import caregoautomation.ui.CareGoAutomationTab;
 
 public class CaregoAutomation implements BurpExtension
 {
