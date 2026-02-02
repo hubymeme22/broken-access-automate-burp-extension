@@ -74,9 +74,21 @@ public class CaregoAutomateSessionLogger {
                     api.logging().logToOutput("[+] Unique Request Session Found!: " + bearerToken);
                     sessionStorage.add(bearerToken);
                 }
-            }            
+            }
         }
 
-        // removal of tokens
+        // removal of tokens for logged out users
+        if (path.contains("logout") && request.method().toLowerCase().equals("post")) {
+            if (request.hasHeader("Authorization")) {
+                HttpHeader authHeader = request.header("Authorization");
+                String bearerToken = authHeader.value().replace("Bearer ", "");
+
+                // unique session token found
+                if (bearerToken != null && !bearerToken.equals("") && sessionStorage.contains(bearerToken)) {
+                    api.logging().logToOutput("[+] Logout Found.. Destroying session: " + bearerToken);
+                    sessionStorage.remove(bearerToken);
+                }
+            }
+        }
     }
 }
