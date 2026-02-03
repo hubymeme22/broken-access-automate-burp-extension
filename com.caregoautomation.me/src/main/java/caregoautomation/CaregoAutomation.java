@@ -9,7 +9,7 @@ import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import caregoautomation.handler.CaregoHTTPHandlerTemplate;
 import caregoautomation.menu_items.CaregoContextMenuItems;
-import caregoautomation.ui.CareGoAutomationTab;
+import caregoautomation.ui.CareGoAutomationUITab;
 
 public class CaregoAutomation implements BurpExtension
 {
@@ -30,7 +30,13 @@ public class CaregoAutomation implements BurpExtension
             )
         );
 
-        api.userInterface().registerSuiteTab("CareGo Automation", new CareGoAutomationTab(api));
+        api.userInterface().registerSuiteTab(
+            "CareGo Automation",
+            new CareGoAutomationUITab(
+                api, this.sessions, this.chosenRequestMap
+            )
+        );
+
         api.http().registerHttpHandler(new CaregoHTTPHandlerTemplate(api, this.sessions));
     }
 }
