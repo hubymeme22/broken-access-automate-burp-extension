@@ -24,27 +24,27 @@ public class CaregoAutomateBrokenAccess {
     }
 
     public void proofOfConcept(ArrayList<String> sessionStorage) {
-        this.api.logging().logToOutput("[+] Testing request idea...");
+        // threaded non-blocking process for for-loop
+        new Thread(() -> {
+            this.api.logging().logToOutput("===============================================");
+            this.api.logging().logToOutput("[*] Testing request: " + this.requestResponse.request().path());
 
-        // retrieve the request ascii
-        String contents = this.requestResponse.request().toString();
+            // new requests based on the derived requests
+            ArrayList<HttpRequest> modifiedRequests = this.getAllBearerConsidered(sessionStorage);
+            if (modifiedRequests.size() <= 0) {
+                this.api.logging().logToOutput("[*] No bearer received... cannot automate test");
+                return;
+            }
 
-        // original request
-        this.api.logging().logToOutput("[*] Request Before:");
-        this.api.logging().logToOutput("\n\n" + contents);
+            this.api.logging().logToOutput("[*] Request testing for different tokens:");
+            for (HttpRequest requestMod: modifiedRequests) {
+                this.api.logging().logToOutput("[*] Testing token: " + requestMod.headerValue("authorization"));
+                this.basicReplayRequest(requestMod);
+            }
 
-        // new requests based on the derived requests
-        ArrayList<HttpRequest> modifiedRequests = this.getAllBearerConsidered(sessionStorage);
-        if (modifiedRequests.size() <= 0) {
-            this.api.logging().logToOutput("[*] No bearer received... cannot automate test");
-            return;
-        }
-
-        this.api.logging().logToOutput("[*] Request testing for different tokens:");
-        for (HttpRequest requestMod: modifiedRequests) {
-            this.api.logging().logToOutput("[*] Testing token: " + requestMod.headerValue("authorization"));
-            this.basicReplayRequest(requestMod);
-        }
+            this.api.logging().logToOutput("[*] Tests done...");
+            this.api.logging().logToOutput("===============================================");
+        }).start();
     }
 
     /**
@@ -72,17 +72,16 @@ public class CaregoAutomateBrokenAccess {
     /**
      * Performs request test case for ord
      */
-    public boolean basicReplayRequest(HttpRequest request) {
+    public void basicReplayRequest(HttpRequest request) {
         HttpRequestResponse responseData = this.api.http().sendRequest(request);
         HttpResponse response = responseData.response();
 
         // result passed
         if (200 <= response.statusCode() && response.statusCode() >= 299) {
             this.api.logging().logToOutput("[+] Returned ok status");
-            return true;
+            return;
         }
 
         this.api.logging().logToOutput("[!] Returned bad status");
-        return false;
     }
 }
