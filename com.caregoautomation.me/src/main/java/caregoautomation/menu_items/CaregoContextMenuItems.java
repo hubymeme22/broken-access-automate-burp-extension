@@ -3,6 +3,7 @@ package caregoautomation.menu_items;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JMenuItem;
 
@@ -17,10 +18,16 @@ import caregoautomation.automate.CaregoAutomateBrokenAccess;
 public class CaregoContextMenuItems implements ContextMenuItemsProvider {
     private final MontoyaApi api;
     private final ArrayList<String> sessionStorage;
+    private final Map<String, HttpRequestResponse> chosenRequestMap;
 
-    public CaregoContextMenuItems(MontoyaApi api, ArrayList<String> sessionStorage) {
+    public CaregoContextMenuItems(
+        MontoyaApi api,
+        ArrayList<String> sessionStorage,
+        Map<String, HttpRequestResponse> chosenRequestMap
+    ) {
         this.api = api;
         this.sessionStorage = sessionStorage;
+        this.chosenRequestMap = chosenRequestMap;
     }
 
     @Override
@@ -39,6 +46,7 @@ public class CaregoContextMenuItems implements ContextMenuItemsProvider {
 
             // event listeners for menu items
             sendCareGoTesting.addActionListener(l -> this.careGoTerminalTest(requestResponse));
+            sendToCareGoAutomation.addActionListener(l -> this.sendToAutomation(requestResponse));
 
             menuItemList.add(sendToCareGoAutomation);
             menuItemList.add(sendCareGoTesting);
@@ -84,5 +92,15 @@ public class CaregoContextMenuItems implements ContextMenuItemsProvider {
         // broken access checks
         CaregoAutomateBrokenAccess brokenAccessCheck = new CaregoAutomateBrokenAccess(this.api, requestResponse);
         brokenAccessCheck.proofOfConcept(this.sessionStorage);
+    }
+
+    /**
+     * Sends the request to the list of selected
+     * requests to be tested
+     */
+    private void sendToAutomation(HttpRequestResponse requestResponse) {
+        String path = requestResponse.request().path();
+        this.chosenRequestMap.put(path, requestResponse);
+        this.api.logging().logToOutput("[*] URL added for automation: " + path);
     }
 }
