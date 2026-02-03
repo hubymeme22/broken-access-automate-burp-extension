@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
+import burp.api.montoya.http.message.responses.HttpResponse;
 
 
 /**
@@ -39,10 +40,10 @@ public class CaregoAutomateBrokenAccess {
             return;
         }
 
-        this.api.logging().logToOutput("[*] Request After:");
+        this.api.logging().logToOutput("[*] Request testing for different tokens:");
         for (HttpRequest requestMod: modifiedRequests) {
-            String requestModString = requestMod.toString();
-            this.api.logging().logToOutput("\n\n" + requestModString);
+            this.api.logging().logToOutput("[*] Testing token: " + requestMod.headerValue("authorization"));
+            this.basicReplayRequest(requestMod);
         }
     }
 
@@ -66,5 +67,22 @@ public class CaregoAutomateBrokenAccess {
         }
 
         return retrievedRequests;
+    }
+
+    /**
+     * Performs request test case for ord
+     */
+    public boolean basicReplayRequest(HttpRequest request) {
+        HttpRequestResponse responseData = this.api.http().sendRequest(request);
+        HttpResponse response = responseData.response();
+
+        // result passed
+        if (200 <= response.statusCode() && response.statusCode() >= 299) {
+            this.api.logging().logToOutput("[+] Returned ok status");
+            return true;
+        }
+
+        this.api.logging().logToOutput("[!] Returned bad status");
+        return false;
     }
 }
