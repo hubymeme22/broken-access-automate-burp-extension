@@ -14,10 +14,16 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.http.message.HttpRequestResponse;
@@ -32,6 +38,8 @@ public class LeftPanel extends JPanel {
     private final String[] columns = { "Method", "IP Address", "Host", "Path" };
 
     private JTable requestTable;
+    private JTextPane logBoxArea;
+    private StyledDocument logBoxDocument;
 
     private final DefaultTableModel requestTableModel = new DefaultTableModel(this.columns, 0) {
         @Override
@@ -49,7 +57,23 @@ public class LeftPanel extends JPanel {
     private void build() {
         this.setLayout(new BorderLayout(10, 10));
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        this.add(this.tableContents(), BorderLayout.CENTER);
+
+        JSplitPane verticalSplit = new JSplitPane(
+            JSplitPane.VERTICAL_SPLIT,
+            this.tableContents(),
+            this.logBox()
+        );
+
+        // 65% table, 35% logs
+        verticalSplit.setResizeWeight(0.65);
+        verticalSplit.setDividerLocation(0.65);
+        verticalSplit.setOneTouchExpandable(false);
+
+        // insert modularized components
+        this.add(verticalSplit, BorderLayout.CENTER);
+
+        // insert initial template message for debug box
+        this.logboxPrint("====== CareGo Automation Log Box ======");
     }
 
     /**
@@ -60,16 +84,17 @@ public class LeftPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         JPanel buttonPanel = new JPanel();
 
-        JButton basicTestBtn = new JButton("Basic Test");
-        JButton advancedTestBtn = new JButton("Advanced Test");
+        JButton basicTestBtn = new JButton("Repeat Test");
+        JButton advancedTestBtn = new JButton("Permutation Test");
         JButton removeBtn = new JButton("Remove");
+        JButton clearBtn = new JButton("Clear");
 
         panel.setOpaque(false);
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.setOpaque(false);
 
         Dimension btnSize = new Dimension(150, 25);
-        for (JButton btn : new JButton[]{ basicTestBtn, advancedTestBtn, removeBtn }) {
+        for (JButton btn : new JButton[]{ basicTestBtn, advancedTestBtn, removeBtn, clearBtn }) {
             btn.setPreferredSize(btnSize);
             btn.setMaximumSize(btnSize);
             btn.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -79,15 +104,18 @@ public class LeftPanel extends JPanel {
         }
 
         // background color for buttons
-        basicTestBtn.setBackground(new Color(54, 207, 72));
-        advancedTestBtn.setBackground(new Color(54, 118, 207));
+        basicTestBtn.setBackground(new Color(37, 107, 47));
+        advancedTestBtn.setBackground(new Color(37, 55, 107));
         removeBtn.setBackground(new Color(207, 54, 69));
+        clearBtn.setBackground(new Color(207, 54, 69));
 
         buttonPanel.add(basicTestBtn);
         buttonPanel.add(Box.createVerticalStrut(8));
         buttonPanel.add(advancedTestBtn);
         buttonPanel.add(Box.createVerticalStrut(8));
         buttonPanel.add(removeBtn);
+        buttonPanel.add(Box.createVerticalStrut(8));
+        buttonPanel.add(clearBtn);
 
         // table and scroll pane
         this.requestTable = new JTable(this.requestTableModel);
@@ -128,6 +156,27 @@ public class LeftPanel extends JPanel {
     }
 
     /**
+     * Log box is a console-style rich text area
+     * for providing debug and logging area for automation terminal
+     */
+    private JComponent logBox() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+
+        this.logBoxArea = new JTextPane();
+        this.logBoxArea.setEditable(false);
+        this.logBoxArea.setBackground(new Color(70, 70, 70));
+
+        JScrollPane scrollPane = new JScrollPane(this.logBoxArea);
+
+        // document text pane adjustments
+        this.logBoxDocument = this.logBoxArea.getStyledDocument();
+        scrollPane.setPreferredSize(new Dimension(600, 500));
+
+        panel.add(scrollPane, BorderLayout.CENTER);
+        return panel;
+    }
+
+    /**
      * Adds a request to the UI and maps the path to the
      * request response
      */
@@ -155,5 +204,23 @@ public class LeftPanel extends JPanel {
             });
 
         });
+    }
+
+    @SuppressWarnings("CallToPrintStackTrace")
+    public void logboxPrint(String message) {
+        try {
+            if (this.logBoxDocument != null) {
+                Style style = this.logBoxArea.addStyle("Info", null);
+                StyleConstants.setForeground(style, Color.BLACK);
+
+                this.logBoxDocument.insertString(
+                    this.logBoxDocument.getLength(),
+                    message + "\n",
+                    style
+                );
+            }
+        } catch (BadLocationException e) {
+             e.printStackTrace();
+        }
     }
 }
