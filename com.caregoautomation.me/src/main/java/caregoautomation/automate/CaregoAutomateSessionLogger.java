@@ -8,6 +8,7 @@ import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.http.handler.HttpRequestToBeSent;
 import burp.api.montoya.http.handler.HttpResponseReceived;
 import burp.api.montoya.http.message.HttpHeader;
+import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.http.message.responses.HttpResponse;
 import caregoautomation.CaregoAutomation;
@@ -47,6 +48,15 @@ public class CaregoAutomateSessionLogger {
             } catch (JsonSyntaxException e) {
                 api.logging().logToOutput(e);
             }
+        }
+
+        // automatically add all the requests that are already under api
+        if (path.contains("api") && request.hasHeader("Authorization")) {
+            HttpRequestResponse requestResponse = HttpRequestResponse.httpRequestResponse(
+                request, responseReceived.copyToTempFile(), responseReceived.annotations()
+            );
+
+            controller.uiTab.leftPanel.addRequest(requestResponse);
         }
     }
 
