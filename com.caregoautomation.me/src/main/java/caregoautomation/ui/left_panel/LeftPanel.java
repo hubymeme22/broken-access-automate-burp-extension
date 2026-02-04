@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -16,13 +17,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import caregoautomation.CaregoAutomation;
+import caregoautomation.ui.left_panel.design.TableHighlightRenderer;
 
 public class LeftPanel extends JPanel {
 
@@ -48,7 +49,7 @@ public class LeftPanel extends JPanel {
     private void build() {
         this.setLayout(new BorderLayout(10, 10));
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        this.add(this.tableContents(), BorderLayout.NORTH);
+        this.add(this.tableContents(), BorderLayout.CENTER);
     }
 
     /**
@@ -90,13 +91,13 @@ public class LeftPanel extends JPanel {
 
         // table and scroll pane
         this.requestTable = new JTable(this.requestTableModel);
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        TableHighlightRenderer rowRenderer = new TableHighlightRenderer();
         JScrollPane scrollPane = new JScrollPane(this.requestTable);
 
         // render the labels to center
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        rowRenderer.setHorizontalAlignment(JLabel.CENTER);
         for (int i = 0; i < this.columns.length; i++) {
-            this.requestTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+            this.requestTable.getColumnModel().getColumn(i).setCellRenderer(rowRenderer);
         }
 
         // table configuration (single selection & show grid)
@@ -107,6 +108,18 @@ public class LeftPanel extends JPanel {
 
         this.requestTable.setFillsViewportHeight(true);
         this.requestTable.setShowGrid(false);
+
+        this.requestTable.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                int row = requestTable.rowAtPoint(e.getPoint());
+                rowRenderer.setHoveredRow(row);
+                requestTable.repaint();
+            }
+        });
+
+        // scroll pane configuration
+        scrollPane.setPreferredSize(new Dimension(600, 200));
 
         panel.add(buttonPanel, BorderLayout.WEST);
         panel.add(scrollPane, BorderLayout.CENTER);
