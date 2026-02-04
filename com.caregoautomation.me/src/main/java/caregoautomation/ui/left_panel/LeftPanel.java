@@ -71,9 +71,6 @@ public class LeftPanel extends JPanel {
 
         // insert modularized components
         this.add(verticalSplit, BorderLayout.CENTER);
-
-        // insert initial template message for debug box
-        this.logboxPrint("====== CareGo Automation Log Box ======");
     }
 
     /**
@@ -87,7 +84,7 @@ public class LeftPanel extends JPanel {
         JButton basicTestBtn = new JButton("Repeat Test");
         JButton advancedTestBtn = new JButton("Permutation Test");
         JButton removeBtn = new JButton("Remove");
-        JButton clearBtn = new JButton("Clear");
+        JButton clearBtn = new JButton("Clear Requests");
 
         panel.setOpaque(false);
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
@@ -106,8 +103,8 @@ public class LeftPanel extends JPanel {
         // background color for buttons
         basicTestBtn.setBackground(new Color(37, 107, 47));
         advancedTestBtn.setBackground(new Color(37, 55, 107));
-        removeBtn.setBackground(new Color(207, 54, 69));
-        clearBtn.setBackground(new Color(207, 54, 69));
+        removeBtn.setForeground(Color.BLACK);
+        clearBtn.setForeground(Color.BLACK);
 
         buttonPanel.add(basicTestBtn);
         buttonPanel.add(Box.createVerticalStrut(8));
@@ -161,17 +158,38 @@ public class LeftPanel extends JPanel {
      */
     private JComponent logBox() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
+        JPanel buttonPanel = new JPanel();
+        JButton exportBtn = new JButton("Export Logs");
+        JButton clearBtn = new JButton("Clear Logs");
 
+        // button configuration
+        Dimension btnSize = new Dimension(150, 25);
+        for (JButton btn : new JButton[]{ exportBtn, clearBtn }) {
+            btn.setPreferredSize(btnSize);
+            btn.setMaximumSize(btnSize);
+            btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            btn.setOpaque(true);
+            btn.setBorderPainted(false);
+        }
+
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setOpaque(false);
+
+        buttonPanel.add(exportBtn);
+        buttonPanel.add(Box.createVerticalStrut(8));
+        buttonPanel.add(clearBtn);
+
+
+        // logbox and logdocument
         this.logBoxArea = new JTextPane();
         this.logBoxArea.setEditable(false);
-        this.logBoxArea.setBackground(new Color(70, 70, 70));
+        this.logBoxArea.setBackground(new Color(250, 250, 250));
+        this.logBoxDocument = this.logBoxArea.getStyledDocument();
 
         JScrollPane scrollPane = new JScrollPane(this.logBoxArea);
-
-        // document text pane adjustments
-        this.logBoxDocument = this.logBoxArea.getStyledDocument();
         scrollPane.setPreferredSize(new Dimension(600, 500));
 
+        panel.add(buttonPanel, BorderLayout.WEST);
         panel.add(scrollPane, BorderLayout.CENTER);
         return panel;
     }
