@@ -1,7 +1,6 @@
 package caregoautomation.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Map;
@@ -16,6 +15,7 @@ import javax.swing.SwingUtilities;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.http.message.HttpRequestResponse;
+import caregoautomation.ui.left_panel.LeftPanel;
 
 public class CareGoAutomationUITab extends JPanel {
 
@@ -45,7 +45,7 @@ public class CareGoAutomationUITab extends JPanel {
 
         JSplitPane centerSplitPane = new JSplitPane(
             JSplitPane.HORIZONTAL_SPLIT,
-            this.leftPanel(),
+            (new LeftPanel(this.api, this.sessions, this.chosenRequestMap)),
             this.rightPanel()
         );
 
@@ -80,16 +80,6 @@ public class CareGoAutomationUITab extends JPanel {
         return headerPanel;
     }
 
-    /**
-     * Left-side panel of the UI, this part contains the
-     * UI: table and debug logs
-     */
-    private JComponent leftPanel() {
-        JPanel leftPanel = new JPanel();
-        leftPanel.setBackground(Color.LIGHT_GRAY);
-
-        return leftPanel;
-    }
 
     /**
      * Right-side panel of the UI, this part contains
@@ -97,7 +87,6 @@ public class CareGoAutomationUITab extends JPanel {
      */
     private JComponent rightPanel() {
         JPanel rightPanel = new JPanel();
-        rightPanel.setBackground(Color.LIGHT_GRAY);
 
         return rightPanel;
     }
