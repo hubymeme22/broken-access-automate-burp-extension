@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -19,21 +17,18 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import burp.api.montoya.MontoyaApi;
-import burp.api.montoya.http.message.HttpRequestResponse;
+import caregoautomation.CaregoAutomation;
 
 public class LeftPanel extends JPanel {
     private final MontoyaApi api;
-    private final ArrayList<String> sessions;
-    private final Map<String, HttpRequestResponse> chosenRequestMap;
+    private final CaregoAutomation controller;
 
     public LeftPanel(
         MontoyaApi api,
-        ArrayList<String> sessions,
-        Map<String, HttpRequestResponse> chosenRequestMap
+        CaregoAutomation controller
     ) {
         this.api = api;
-        this.sessions = sessions;
-        this.chosenRequestMap = chosenRequestMap;
+        this.controller = controller;
         this.build();
     }
 

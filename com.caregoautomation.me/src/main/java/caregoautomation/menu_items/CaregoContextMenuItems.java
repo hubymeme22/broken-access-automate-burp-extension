@@ -3,7 +3,6 @@ package caregoautomation.menu_items;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JMenuItem;
 
@@ -13,21 +12,19 @@ import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.ui.contextmenu.ContextMenuEvent;
 import burp.api.montoya.ui.contextmenu.ContextMenuItemsProvider;
+import caregoautomation.CaregoAutomation;
 import caregoautomation.automate.CaregoAutomateBrokenAccess;
 
 public class CaregoContextMenuItems implements ContextMenuItemsProvider {
     private final MontoyaApi api;
-    private final ArrayList<String> sessionStorage;
-    private final Map<String, HttpRequestResponse> chosenRequestMap;
+    private final CaregoAutomation controller;
 
     public CaregoContextMenuItems(
         MontoyaApi api,
-        ArrayList<String> sessionStorage,
-        Map<String, HttpRequestResponse> chosenRequestMap
+        CaregoAutomation controller
     ) {
         this.api = api;
-        this.sessionStorage = sessionStorage;
-        this.chosenRequestMap = chosenRequestMap;
+        this.controller = controller;
     }
 
     @Override
@@ -91,7 +88,7 @@ public class CaregoContextMenuItems implements ContextMenuItemsProvider {
 
         // broken access checks
         CaregoAutomateBrokenAccess brokenAccessCheck = new CaregoAutomateBrokenAccess(this.api, requestResponse);
-        brokenAccessCheck.proofOfConcept(this.sessionStorage);
+        brokenAccessCheck.proofOfConcept(this.controller.sessions);
     }
 
     /**
@@ -100,7 +97,7 @@ public class CaregoContextMenuItems implements ContextMenuItemsProvider {
      */
     private void sendToAutomation(HttpRequestResponse requestResponse) {
         String path = requestResponse.request().path();
-        this.chosenRequestMap.put(path, requestResponse);
+        this.controller.chosenRequestMap.put(path, requestResponse);
         this.api.logging().logToOutput("[*] URL added for automation: " + path);
     }
 }

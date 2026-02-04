@@ -15,6 +15,7 @@ public class CaregoAutomation implements BurpExtension
 {
     public final ArrayList<String> sessions;
     public final Map<String, HttpRequestResponse> chosenRequestMap;
+    public CareGoAutomationUITab uiTab;
 
     public CaregoAutomation() {
         this.sessions = new ArrayList<>();
@@ -24,19 +25,17 @@ public class CaregoAutomation implements BurpExtension
     @Override
     public void initialize(MontoyaApi api) {
         api.extension().setName("CaregoAutomation Extension");
+
+        // automation tab user interface
+        this.uiTab = new CareGoAutomationUITab(api, this);
+        api.userInterface().registerSuiteTab("CareGo Automation", this.uiTab);
+
+        // context menu for repeater and proxy
         api.userInterface().registerContextMenuItemsProvider(
-            new CaregoContextMenuItems(
-                api, this.sessions, this.chosenRequestMap
-            )
+            new CaregoContextMenuItems(api, this)
         );
 
-        api.userInterface().registerSuiteTab(
-            "CareGo Automation",
-            new CareGoAutomationUITab(
-                api, this.sessions, this.chosenRequestMap
-            )
-        );
-
+        // http reqest and response middleware
         api.http().registerHttpHandler(new CaregoHTTPHandlerTemplate(api, this.sessions));
     }
 }

@@ -2,8 +2,6 @@ package caregoautomation.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.util.ArrayList;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -14,23 +12,19 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 
 import burp.api.montoya.MontoyaApi;
-import burp.api.montoya.http.message.HttpRequestResponse;
+import caregoautomation.CaregoAutomation;
 import caregoautomation.ui.left_panel.LeftPanel;
 
 public class CareGoAutomationUITab extends JPanel {
-
     private final MontoyaApi api;
-    private final ArrayList<String> sessions;
-    private final Map<String, HttpRequestResponse> chosenRequestMap;
+    private final CaregoAutomation controller;
 
     public CareGoAutomationUITab(
         MontoyaApi api,
-        ArrayList<String> sessions,
-        Map<String, HttpRequestResponse> chosenRequestMap
+        CaregoAutomation controller
     ) {
+        this.controller = controller;
         this.api = api;
-        this.sessions = sessions;
-        this.chosenRequestMap = chosenRequestMap;
         buildUI();
     }
 
@@ -45,7 +39,7 @@ public class CareGoAutomationUITab extends JPanel {
 
         JSplitPane centerSplitPane = new JSplitPane(
             JSplitPane.HORIZONTAL_SPLIT,
-            (new LeftPanel(this.api, this.sessions, this.chosenRequestMap)),
+            (new LeftPanel(this.api, this.controller)),
             this.rightPanel()
         );
 
