@@ -97,7 +97,7 @@ public class CaregoContextMenuItems implements ContextMenuItemsProvider {
      */
     private void sendToAutomation(HttpRequestResponse requestResponse) {
         String path = requestResponse.request().path();
-        this.controller.chosenRequestMap.put(path, requestResponse);
         this.api.logging().logToOutput("[*] URL added for automation: " + path);
+        this.controller.uiTab.leftPanel.addRequest(requestResponse);
     }
 }

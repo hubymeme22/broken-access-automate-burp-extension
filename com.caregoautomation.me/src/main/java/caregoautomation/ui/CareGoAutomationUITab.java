@@ -18,6 +18,7 @@ import caregoautomation.ui.left_panel.LeftPanel;
 public class CareGoAutomationUITab extends JPanel {
     private final MontoyaApi api;
     private final CaregoAutomation controller;
+    public final LeftPanel leftPanel;
 
     public CareGoAutomationUITab(
         MontoyaApi api,
@@ -25,6 +26,8 @@ public class CareGoAutomationUITab extends JPanel {
     ) {
         this.controller = controller;
         this.api = api;
+        this.leftPanel = new LeftPanel(api, controller);
+
         buildUI();
     }
 
@@ -39,7 +42,7 @@ public class CareGoAutomationUITab extends JPanel {
 
         JSplitPane centerSplitPane = new JSplitPane(
             JSplitPane.HORIZONTAL_SPLIT,
-            (new LeftPanel(this.api, this.controller)),
+            this.leftPanel,
             this.rightPanel()
         );
 
