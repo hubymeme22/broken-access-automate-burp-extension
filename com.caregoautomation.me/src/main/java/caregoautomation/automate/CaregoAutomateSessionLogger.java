@@ -1,8 +1,6 @@
 package caregoautomation.automate;
 
 
-import java.util.ArrayList;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -12,6 +10,7 @@ import burp.api.montoya.http.handler.HttpResponseReceived;
 import burp.api.montoya.http.message.HttpHeader;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.http.message.responses.HttpResponse;
+import caregoautomation.CaregoAutomation;
 import caregoautomation.models.AuthModel;
 
 
@@ -23,7 +22,7 @@ public class CaregoAutomateSessionLogger {
     public static void sessionLoginLogger(
         MontoyaApi api,
         HttpResponseReceived responseReceived,
-        ArrayList<String> sessionStorage
+        CaregoAutomation controller
     ) {
         HttpRequest request = responseReceived.initiatingRequest();
         String path = request.path().toLowerCase();
@@ -40,9 +39,9 @@ public class CaregoAutomateSessionLogger {
                 // ensure that the token is properly set
                 if (authResponse.token != null) {
                     // ensure that token is unique everytime
-                    if (!sessionStorage.contains(authResponse.token)) {
+                    if (!controller.sessions.contains(authResponse.token)) {
                         api.logging().logToOutput("[+] Login Session Found!: " + authResponse.token);
-                        sessionStorage.add(authResponse.token);
+                        controller.sessions.add(authResponse.token);
                     }
                 }
             } catch (JsonSyntaxException e) {
@@ -56,9 +55,7 @@ public class CaregoAutomateSessionLogger {
      * general requests
      */
     public static void generalRequestSessionLogger(
-        MontoyaApi api,
-        HttpRequestToBeSent responseReceived,
-        ArrayList<String> sessionStorage
+        MontoyaApi api, HttpRequestToBeSent responseReceived, CaregoAutomation controller
     ) {
         HttpRequest request = responseReceived.copyToTempFile();
         String path = request.path().toLowerCase();
@@ -70,9 +67,9 @@ public class CaregoAutomateSessionLogger {
                 String bearerToken = authHeader.value().replace("Bearer ", "");
 
                 // unique session token found
-                if (bearerToken != null && !bearerToken.equals("") && !sessionStorage.contains(bearerToken)) {
+                if (bearerToken != null && !bearerToken.equals("") && !controller.sessions.contains(bearerToken)) {
                     api.logging().logToOutput("[+] Unique Request Session Found!: " + bearerToken);
-                    sessionStorage.add(bearerToken);
+                    controller.sessions.add(bearerToken);
                 }
             }
         }
@@ -84,9 +81,9 @@ public class CaregoAutomateSessionLogger {
                 String bearerToken = authHeader.value().replace("Bearer ", "");
 
                 // unique session token found
-                if (bearerToken != null && !bearerToken.equals("") && sessionStorage.contains(bearerToken)) {
+                if (bearerToken != null && !bearerToken.equals("") && controller.sessions.contains(bearerToken)) {
                     api.logging().logToOutput("[+] Logout Found.. Destroying session: " + bearerToken);
-                    sessionStorage.remove(bearerToken);
+                    controller.sessions.remove(bearerToken);
                 }
             }
         }

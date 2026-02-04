@@ -36,6 +36,6 @@ public class CaregoAutomation implements BurpExtension
         );
 
         // http reqest and response middleware
-        api.http().registerHttpHandler(new CaregoHTTPHandlerTemplate(api, this.sessions));
+        api.http().registerHttpHandler(new CaregoHTTPHandlerTemplate(api, this));
     }
 }

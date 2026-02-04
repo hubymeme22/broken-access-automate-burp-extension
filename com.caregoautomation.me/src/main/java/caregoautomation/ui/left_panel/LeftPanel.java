@@ -28,7 +28,7 @@ public class LeftPanel extends JPanel {
 
     private final MontoyaApi api;
     private final CaregoAutomation controller;
-    private final String[] columns = { "Method", "IP Address", "Host", "Path", "Date" };
+    private final String[] columns = { "Method", "IP Address", "Host", "Path" };
 
     private JTable requestTable;
 
@@ -114,9 +114,18 @@ public class LeftPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * Adds a request to the UI and maps the path to the
+     * request response
+     */
     public void addRequest(HttpRequestResponse requestResponse) {
         SwingUtilities.invokeLater(() -> {
             HttpRequest request = requestResponse.request();
+
+            // check if the request is already in the map
+            if (this.controller.chosenRequestMap.containsKey(request.path())) {
+                return;
+            }
 
             this.controller.chosenRequestMap.put(
                 request.path(), requestResponse
@@ -126,12 +135,12 @@ public class LeftPanel extends JPanel {
             String ipAddress = requestResponse.httpService().ipAddress();
             String host = requestResponse.httpService().host();
             String path = request.path();
-            String date = requestResponse.timingData().toString();
 
             // add contents to the table
             this.requestTableModel.addRow(new Object[] {
-                method, ipAddress, host, path, date
+                method, ipAddress, host, path
             });
+
         });
     }
 }

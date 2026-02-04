@@ -1,13 +1,12 @@
 package caregoautomation.handler;
 
-import java.util.ArrayList;
-
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.http.handler.HttpHandler;
 import burp.api.montoya.http.handler.HttpRequestToBeSent;
 import burp.api.montoya.http.handler.HttpResponseReceived;
 import burp.api.montoya.http.handler.RequestToBeSentAction;
 import burp.api.montoya.http.handler.ResponseReceivedAction;
+import caregoautomation.CaregoAutomation;
 import caregoautomation.automate.CaregoAutomateSessionLogger;
 
 /**
@@ -18,22 +17,22 @@ import caregoautomation.automate.CaregoAutomateSessionLogger;
  */
 public class CaregoHTTPHandlerTemplate implements HttpHandler {
     private final MontoyaApi api;
-    private final ArrayList<String> sessionStorage;
+    private final CaregoAutomation controller;
 
-    public CaregoHTTPHandlerTemplate(MontoyaApi api, ArrayList<String> sessionStorage) {
+    public CaregoHTTPHandlerTemplate(MontoyaApi api, CaregoAutomation controller) {
         this.api = api;
-        this.sessionStorage = sessionStorage;
+        this.controller = controller;
     }
 
     @Override
     public RequestToBeSentAction handleHttpRequestToBeSent(HttpRequestToBeSent requestToBeSent) {
-        CaregoAutomateSessionLogger.generalRequestSessionLogger(this.api, requestToBeSent, this.sessionStorage);
+        CaregoAutomateSessionLogger.generalRequestSessionLogger(this.api, requestToBeSent, this.controller);
         return RequestToBeSentAction.continueWith(requestToBeSent);
     }
 
     @Override
     public ResponseReceivedAction handleHttpResponseReceived(HttpResponseReceived responseReceived) {
-        CaregoAutomateSessionLogger.sessionLoginLogger(this.api, responseReceived, this.sessionStorage);
+        CaregoAutomateSessionLogger.sessionLoginLogger(this.api, responseReceived, this.controller);
         return ResponseReceivedAction.continueWith(responseReceived);
     }
 }
